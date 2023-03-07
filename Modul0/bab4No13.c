@@ -6,6 +6,14 @@ struct Node
     int data;
     struct Node* next;
 };
+
+struct Node* newNode(int data){
+    struct Node* pink = (struct Node*)malloc(sizeof(struct Node));
+    pink->data = data;
+    pink->next = NULL;
+    return pink;
+}
+
 void makeLink(struct Node** pointerHead, int green){
     struct Node* temp1 = (struct Node*)malloc(sizeof(struct Node));
     temp1->data = green;
@@ -32,25 +40,38 @@ void mengPrint(struct Node* mengHead){
     printf("\n");
 }
 
-void deleteFront(struct Node** gray){
-    struct Node* temp = *gray;
-    *gray = temp->next;
-    free(temp);
+struct Node* mengReverse(struct Node* magenta){
+    if(magenta == NULL || magenta->next == NULL) return magenta;
+    struct Node* res = mengReverse(magenta->next);
+    magenta->next->next = magenta;
+    magenta->next = NULL;
+    return res;
 }
 
-void sum(struct Node** cyan, struct Node** magenta, struct Node** yellow){
-    int temp1 = 0;
-    if((*cyan) != NULL || (*magenta) != NULL){
-        temp1 += (*cyan)->data;
-        temp1 += (*magenta)->data;
+struct Node* sumTwoNode(struct Node* white, struct Node* black){
+    struct Node* res = NULL;
+    struct Node *temp, *prev = NULL;
+    int carry = 0, tambah;
+
+    while (white != NULL || black != NULL){
+        tambah = carry + (white ? white->data : 0) + (black ? black->data : 0);
+        carry = (tambah >= 10) ? 1 : 0;
+        tambah %= 10;
+        temp = newNode(tambah);
+
+        if(res == NULL){
+            res = temp;
+        } else {
+            prev->next = temp;
+        }
+        prev = temp;
+
+        if(white) white = white->next;
+        if(black) black = black->next;
     }
-
-    // printf("%d", temp1);
-    deleteFront(&*cyan);
-    deleteFront(&*magenta);
-    makeLink(&*yellow, temp1);
+    if(carry > 0) temp->next = newNode(carry);
+    return res;
 }
-
 
 int main(){
     struct Node* num1 = NULL;
@@ -72,14 +93,13 @@ int main(){
         n2 = n2 / 10; 
     }
 
-    while (num1 != NULL || num2 != NULL){
-        sum(&num1, &num2, &total);
+    total = sumTwoNode(num1, num2);
 
-    }
-        
-    mengPrint(num1);
-    mengPrint(num2);
+    printf("Total (reverse) -> ");
     mengPrint(total);
 
+    total = mengReverse(total);
+    printf("Total -> ");
+    mengPrint(total);
     return 0;
 }
